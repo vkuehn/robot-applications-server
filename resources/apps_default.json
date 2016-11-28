@@ -1,0 +1,20 @@
+{"application": [
+		{
+			"gitPath": "not yet",
+			"localPath": "",
+			"name": "RCA",
+			"webPath": "/gitapp/rca/index.html"
+		},
+		{
+			"gitPath": "https://github.com/gaug-cns/ros-control-center.git",
+			"localPath": "",
+			"name": "ROSCC",
+			"webPath": "/gitapp/roscc/index.html"
+		},
+		{
+			"gitPath": "https://github.com/jmoenig/Snap--Build-Your-Own-Blocks.git",
+			"localPath": "",
+			"name": "SNAP",
+			"webPath": "/gitapp/snap/snap.html"
+		}
+	]}

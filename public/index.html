@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Robot Application Server</title>
+<link href="/javascripts/jquery-ui-1.12.1.custom/jquery-ui.css"  rel="stylesheet">
+<link href="/javascripts/jquery-ui-iconfont-master/jquery-ui.icon-font.css" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/robot-applications-server.css" rel="stylesheet" type="text/css" />
+<script src="/javascripts/jquery-ui-1.12.1.custom/external/jquery/jquery.js"></script>
+<script src="/javascripts/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico">
+</HEAD>
+<BODY>
+	<!-- Title  -->
+	<div id="title">
+		<h2>Robot Application Server</h2>
+	</div>
+	<div id="hackffmLogo">
+		<img src="/images/hackffm_logo.png" alt="Hackerspace FFM" />
+	</div>
+
+	<!-- infos ------------------------------------------------------------------>
+	<div id="welcome"></div>
+
+	<!-- hidden until requiered -->
+	<div id="warnings">
+		<div class="ui-state-error ui-corner-all">
+			<p id="warningText" />
+		</div>
+	</div>
+	<div id="serverIPs">
+		<p>Robot Server can be reached via</p>
+		<ul></ul>
+	</div>
+
+	<input type="text" id="guide" readonly />
+
+	<!-- Shutdown Button -------------------------------------------------------->
+	<div id="iconShutdown">
+		<a href="/robot-applications-server/doShutdown" class="ui-icon ui-icon-power">icon</a>
+	</div>
+
+	<!-- Tabs ------------------------------------------------------------------->
+	<div id="tabsHeader">
+		<h2 class="textheaders">Robot Applications</h2>
+	</div>
+	<div id="tabs">
+		<ul></ul>
+	</div>
+
+	<!--modal dialog for additional applications--------------------------------->
+	<div>
+		<div id="titleAdditionalApp">
+			<h4>Choose an additional Application</h4>
+		</div>
+
+		<!-- modal dialog for freeApplications-->
+		<div class="ui-widget">
+			<input id="freeApplications">
+		</div>
+		<div>
+			<a id="addFreeApplication" class="ui-icon ui-icon-plus">plus</a>
+		</div>
+	</div>
+
+	<!-- modal dialog is hidden through js--.................-------------------->
+	<!-- new FreeApp => nfa -->
+	<div id="dialogFreeApp" title="newFreeApp">
+		<form>
+			<table>
+				<tr>
+					<td><label for="nfagitPath">GitPath</label></td>
+					<td><input type="text" name="nfagitPath" id="nfagitPath"
+						value="none" class="text ui-widget-content ui-corner-all"></td>
+				</tr>
+				<tr>
+					<td><label for="nfalocalPath">LocalPath</label></td>
+					<td><input type="text" name="nfalocalPath" id="nfalocalPath"
+						value="none" class="text ui-widget-content ui-corner-all"></td>
+				</tr>
+				<tr>
+					<td><label for="nfaname">Name</label></td>
+					<td><input type="text" name="nfaname" id="nfaname"
+						value="MyNewApp" class="text ui-widget-content ui-corner-all"></td>
+				</tr>
+				<tr>
+					<td><label for="nfawebPath">WebPath</label></td>
+					<td><input type="text" name="nfawebPath" id="nfawebPath"
+						value="http://smith.com"
+						class="text ui-widget-content ui-corner-all"></td>
+				</tr>
+				<tr>
+					<!-- Allow form submission with keyboard -->
+					<td><input type="submit" tabindex="-1"
+						style="position: absolute; top: -1000px"></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	<br>
+	<!-- JavaScript=========================================================== -->
+	<script>
+		"use strict";
+
+		/* start */
+		var appName = 'robot-applications-server';
+		var url = '/' + appName + '/api';
+		var gCount = 1;
+
+		$(function() {
+			$("#warnings").hide();
+			$("#welcome").text("Hello User");
+			$("#guide").val("Choose application tab !");
+			$.getJSON(url + "/getServerIPAdresses", function(ips) { addIPAdresses(ips); });
+			var tabs = $("#tabs").tabs();
+			$.getJSON(url + "/getDefaultApps", function(obj) {	addTabs(obj);	});
+			$.getJSON(url + "/getFreeApps", function(obj) {	callAddTag(obj);	});
+			$("#addFreeApplication").click(function() {	$("#dialogFreeApp").dialog("open");	});
+
+			$("#dialogFreeApp").dialog({
+				autoOpen : false,
+				height : 200,
+				width : 350,
+				modal : true,
+				buttons : {
+					OK : function() {	$(this).dialog("close"), validateFreeApp();	},
+					Cancel : function() {	$(this).dialog("close"); }
+				},
+				title : "Success",
+				position : {
+					my : "left center",
+					at : "left center"
+				}
+			});
+			//tabs sortable
+			tabs.find( ".ui-tabs-nav" ).sortable({
+				axis: "x",
+				stop: function() {
+					tabs.tabs( "refresh" );
+				}
+			});
+			//tabs closeable
+	    tabs.on( "click", "span.ui-icon-close", function() {
+	      var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
+	      $( "#" + panelId ).remove();
+	      tabs.tabs( "refresh" );
+	    });
+
+	    tabs.on( "keyup", function( event ) {
+	      if ( event.altKey && event.keyCode === $.ui.keyCode.BACKSPACE ) {
+	        var panelId = tabs.find( ".ui-tabs-active" ).remove().attr( "aria-controls" );
+	        $( "#" + panelId ).remove();
+	        tabs.tabs( "refresh" );
+	      }
+	    });
+
+		});/* end of init process--------- */
+
+		function addIPAdresses(ips) {
+			var list = [];
+			ips.forEach(function(ip){ list.push("<li>" + ip + "</li>");});
+			$("#serverIPs").append(list);
+		}
+
+		/* -------------Modal Dialog for free apps-------------------------------- */
+		function callAddTag(obj) {
+			var simpleArr = [];
+			obj.applications.forEach(function(t) {
+				simpleArr.push(t.name);
+			});
+			addTabforFreeApp(simpleArr);
+		}
+
+		function addTabforFreeApp(simpleArr) {
+			$("#freeApplications").autocomplete({
+				source : simpleArr
+			});
+			$("#freeApplications").on(
+					"autocompleteselect",
+					function(event, ui) {
+						$.getJSON(url + '/getFreeApp/' + ui.item.label,
+								function(app) {
+									addTab(app);
+								});
+					});
+		}
+
+		/* real validation of new apps done on server side  */
+		function validateFreeApp() {
+			var gitPath = $("#nfagitPath").val();
+			var localPath = $("#nfalocalPath").val();
+			var name = $("#nfaname").val();
+			var webPath = $("#nfawebPath").val();
+			var app = {
+				gitPath : gitPath,
+				localPath : localPath,
+				name : name,
+				webPath : webPath
+			}
+			addFreeApp(app);
+		}
+
+ 		function addFreeApp(app) {
+ 			$.post(url + '/addFreeApp/', app).done( function(result) {
+				console.log(result);
+			});
+		}
+
+		/* -------------Tab Handling--------------------------- */
+
+		function addTabs(obj) {
+			obj.application.forEach(function(app) {
+				addTab(app)
+			});
+		}
+
+		function addTab(app) {
+			var tabs = $("#tabs").tabs();
+			var ul = tabs.find("ul");
+			$("<li><a href='#tabs-" + gCount + "'>" + app.name + "</a>" +
+				'<span class="ui-icon ui-icon-close" role="presentation">Remove Tab</span>' +
+				"</li>").appendTo(ul);
+			$("<div id='tabs-" + gCount + "'><iframe frameborder='0' src='" + app.webPath + "'></iframe></div>")
+					.appendTo(tabs);
+			gCount++;
+			tabs.tabs("refresh");
+			tabs.tabs("destroy");
+			tabs.tabs();
+		}
+	</script>
+</BODY>
+</HTML>

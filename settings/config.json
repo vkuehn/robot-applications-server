@@ -1,0 +1,17 @@
+{
+  "appName": "robot-applications-server",
+  "appNameShort": "ras",
+  "appDataPath": "/data",
+  "appsDefaultFile": "apps_default.json",
+  "appsFreeFile": "apps_free.json",
+  "appsGitPath": "/gitapp",
+  "resourcePath": "./reources/",
+  "directoryOnce": [
+      {"path": "/data"},
+      {"path": "/gitapp"}
+    ],
+  "copyFileOnce": [
+      {"copy" : {"source" : "config/config.json" , "destination" : "/config/config.json" } },
+      {"copy" : {"source" : "appsFree.json", "destination" : "/data/appsFree.json" } }
+    ]
+}
