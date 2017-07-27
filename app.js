@@ -37,7 +37,7 @@ var urlencodedParser = app.use(bodyParser.urlencoded({
 var helper = require('./node_modules/node-helper/node-helper.js');
 
 //keep the order here !
-const configPath = '../settings/';
+const configPath = './settings/';
 const configFile = 'config.json';
 const config =	JSON.parse(helper.loadFile(configPath + '/' + configFile));
 
@@ -88,7 +88,7 @@ app.post('/' + appName + '/api/addFreeApp/', function (req, res) {
 });
 
 app.get('/' + appName + '/api/getServerIPAdresses', function(req, res) {
-	ips = helper.getLocalIPs();
+	var ips = helper.getLocalIPs();
 	res.send(ips);
 });
 
