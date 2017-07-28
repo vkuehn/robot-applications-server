@@ -5,7 +5,7 @@
   "appsDefaultFile": "apps_default.json",
   "appsFreeFile": "apps_free.json",
   "appsGitPath": "/gitapp",
-  "resourcePath": "./reources/",
+  "resourcePath": "./resources/",
   "directoryOnce": [
       {"path": "/data"},
       {"path": "/gitapp"}

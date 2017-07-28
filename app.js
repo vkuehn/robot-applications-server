@@ -36,10 +36,10 @@ var urlencodedParser = app.use(bodyParser.urlencoded({
 //----application stuff---------------------------------------------------------
 var helper = require('./node_modules/node-helper/node-helper.js');
 
-//keep the order here !
+//keep the order from here !
 const configPath = './settings/';
-const configFile = 'config.json';
-const config =	JSON.parse(helper.loadFile(configPath + '/' + configFile));
+var configFile = configPath + 'config.json';
+var config =	JSON.parse(helper.loadFile(configFile));
 
 var appName         = config.appName;
 var appsDefaultFile = config.appsDefaultFile;
