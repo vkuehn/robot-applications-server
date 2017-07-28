@@ -51,18 +51,19 @@ var userAppHome			= helper.getUserHome() + '/.' + appName;
 var appDataPath		  = userAppHome + '/' + config.appDataPath;
 var appsFreePath    = appDataPath + '/' + appsFreeFile;
 
-const Application = require(resourcePath).Application;
+const Application = require(resourcePath + '/' + 'application.js');
 
 app.use(appsGitPath, express.static(userAppHome + '/' + appsGitPath + "/"));
 
 //--preparations----------------------------------------------------------------
 //TODO run ./lib/ras/preparations.js
+//TODO debug einbauen
 
-helper.log ('start ' + appName);
+console.log ('start ' + appName);
 
 //==API's=======================================================================
 app.get('/' + appName + '/api/getDefaultApps', function(req, res) {
-    var defaultApps = helper.loadFile(resourcesPath + appsDefaultFile);
+    var defaultApps = helper.loadFile(resourcePath + '/' + appsDefaultFile);
 		res.end(defaultApps);
 });
 
