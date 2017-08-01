@@ -56,9 +56,8 @@ const Application = require(resourcePath + '/' + 'application.js');
 app.use(appsGitPath, express.static(userAppHome + '/' + appsGitPath + "/"));
 
 //--preparations----------------------------------------------------------------
-//TODO run ./lib/ras/preparations.js
-//TODO debug einbauen
-
+//TODO run ./ressources/preparations.js
+console.log('to see more debug output on linux export DEBUG=* e.g. on windows set DEBUG=*,-not_this');
 console.log ('start ' + appName);
 
 //==API's=======================================================================
